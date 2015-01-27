@@ -1,0 +1,13 @@
+{
+    "name": "node-tech-dyndb",
+    "version": "1.0.0",
+    "main": "techDynDb.js",
+    "dependencies": {
+        "aws-sdk": "^2.0.29",
+        "bluebird": "^2.3.11",
+        "dynamodb-data-types": "^0.2.7",
+        "lodash": "^2.4.1",
+        "node-tech-time": "git://github.com/AirVantage/node-tech-time.git#1.0.0",
+        "node-tech-logger": "git://github.com/AirVantage/node-tech-logger.git#1.0.0"
+    }
+}
