@@ -2,6 +2,10 @@
     "name": "node-tech-dyndb",
     "version": "1.0.0",
     "main": "techDynDb.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AirVantage/node-tech-dyndb.git"
+    },
     "dependencies": {
         "aws-sdk": "^2.0.29",
         "bluebird": "^2.3.11",
