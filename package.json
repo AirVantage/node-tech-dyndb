@@ -1,6 +1,8 @@
 {
     "name": "node-tech-dyndb",
     "version": "1.0.0",
+    "description": "Dynamo DB wrapper",
+    "license": "MIT",
     "main": "techDynDb.js",
     "repository": {
         "type": "git",
