@@ -16,12 +16,18 @@ var techTime = require("node-tech-time");
  */
 module.exports = function(configuration) {
 
-    var dyn = new AWS.DynamoDB({
-        endpoint: new AWS.Endpoint(configuration.dynDB.endpoint),
-        accessKeyId: configuration.dynDB.accessKeyId,
-        secretAccessKey: configuration.dynDB.secretAccessKey,
+    var dynDBOptions = {
         region: configuration.dynDB.region
-    });
+    };
+
+    // Endpoint and credentials are used only in development mode
+    // In production, no endpoint is required and credentials will be automatically provided
+    if (configuration.dynDB.endpoint){
+        dynDBOptions.endpoint = new AWS.Endpoint(configuration.dynDB.endpoint);
+        dynDBOptions.accessKeyId = configuration.dynDB.accessKeyId;
+        dynDBOptions.secretAccessKey = configuration.dynDB.secretAccessKey;
+    }
+    var dyn = new AWS.DynamoDB(dynDBOptions);
 
     var emitter = new events.EventEmitter();
 
