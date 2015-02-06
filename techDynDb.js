@@ -22,7 +22,7 @@ module.exports = function(configuration) {
 
     // Endpoint and credentials are used only in development mode
     // In production, no endpoint is required and credentials will be automatically provided
-    if (configuration.dynDB.endpoint){
+    if (configuration.dynDB.local){
         dynDBOptions.endpoint = new AWS.Endpoint(configuration.dynDB.endpoint);
         dynDBOptions.accessKeyId = configuration.dynDB.accessKeyId;
         dynDBOptions.secretAccessKey = configuration.dynDB.secretAccessKey;
