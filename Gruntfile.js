@@ -10,8 +10,7 @@ module.exports = function(grunt) {
                 afterReleaseTasks: ['tag'],
                 github: {
                     repo: "AirVantage/node-tech-dyndb",
-                    usernameVar: 'GITHUB_USERNAME',
-                    passwordVar: 'GITHUB_PASSWORD'
+                    accessTokenVar: "GITHUB_ACCESS_TOKEN"
                 }
             }
         },
