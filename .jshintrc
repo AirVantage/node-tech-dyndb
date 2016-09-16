@@ -22,7 +22,6 @@
         "resourcesUrlBase": true,
         "serverUrlBase": true,
         "servicesUrlBase": true,
-        "userManualUrl": true,
         "xdescribe": true
     }
 }
