@@ -123,7 +123,7 @@ module.exports = function(configuration) {
 
         return new BPromise(function(resolve, reject) {
             dyn.putItem({
-                Item: _.extend(dynKey, dynData),
+                Item: _.assignIn(dynKey, dynData),
                 TableName: tableName
             }, function(err, data) {
 
