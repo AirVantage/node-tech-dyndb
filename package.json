@@ -12,7 +12,7 @@
     "aws-sdk": "^2.0.29",
     "bluebird": "^2.9.9",
     "dynamodb-data-types": "^2.0.0",
-    "lodash": "^3.2.0",
+    "lodash": "^4.16.0",
     "node-tech-time": "git://github.com/AirVantage/node-tech-time.git#1.x",
     "node-tech-logger": "git://github.com/AirVantage/node-tech-logger.git#3.x"
   },
