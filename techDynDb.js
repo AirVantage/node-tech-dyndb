@@ -46,7 +46,7 @@ module.exports = function(configuration) {
         var res = dynTypes.AttributeValue.unwrap(dynObject);
 
         // We now have to remove the 'key' part, since it is not JSON-encoded data
-        _.each(key, function(v, k) {
+        _.forEach(key, function(v, k) {
             if (res && res[k]) {
                 delete res[k];
             }
