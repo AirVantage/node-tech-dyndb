@@ -17,7 +17,7 @@
     "node-tech-logger": "git://github.com/AirVantage/node-tech-logger.git#3.x"
   },
   "optionalDependencies": {
-    "winston-syslog": "^1.0.0"
+    "winston-syslog": "^1.2.5"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
