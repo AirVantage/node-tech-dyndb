@@ -1,10 +1,10 @@
-var _ = require("lodash");
-var AWS = require("aws-sdk");
-var BPromise = require("bluebird");
-var dynTypes = require("dynamodb-data-types");
-var events = require("events");
-var logger = require("node-tech-logger");
-var techTime = require("node-tech-time");
+var _ = require('lodash');
+var AWS = require('aws-sdk');
+var BPromise = require('bluebird');
+var dynTypes = require('dynamodb-data-types');
+var events = require('events');
+var logger = require('node-tech-logger');
+var techTime = require('node-tech-time');
 
 /**
  * Wrapper around AWS DynanomDB.
@@ -15,14 +15,13 @@ var techTime = require("node-tech-time");
  * @param configuration.dynDB.region {String}
  */
 module.exports = function(configuration) {
-
     var dynDBOptions = {
         region: configuration.dynDB.region
     };
 
     // Endpoint and credentials are used only in development mode
     // In production, no endpoint is required and credentials will be automatically provided
-    if (configuration.dynDB.local){
+    if (configuration.dynDB.local) {
         dynDBOptions.endpoint = new AWS.Endpoint(configuration.dynDB.endpoint);
         dynDBOptions.accessKeyId = configuration.dynDB.accessKeyId;
         dynDBOptions.secretAccessKey = configuration.dynDB.secretAccessKey;
@@ -32,14 +31,13 @@ module.exports = function(configuration) {
     var emitter = new events.EventEmitter();
 
     function notify(ruuid, key, category, duration) {
-        emitter.emit("dynamodb", {
+        emitter.emit('dynamodb', {
             category: category,
-            ruuid: ruuid || "unknown",
+            ruuid: ruuid || 'unknown',
             key: key,
             duration: duration
         });
     }
-
 
     function dynObjectToJson(dynObject, key) {
         // All keys are stored with types ( { foo : { 'S" : "bar" } } )
@@ -59,28 +57,35 @@ module.exports = function(configuration) {
     }
 
     function _strMapToJson(strMap) {
-        return _.reduce(strMap, function(memo, value, key) {
-            try {
-                memo[key] = JSON.parse(value);
-            } catch (e) {
-                // NOTE(pht)
-                // Typically, this is the the case where I don't know how we want to handle
-                // the error.
-                logger.error("Unable to parse key", e, "of strMap", strMap);
-            }
-            return memo;
-        }, {});
+        return _.reduce(
+            strMap,
+            function(memo, value, key) {
+                try {
+                    memo[key] = JSON.parse(value);
+                } catch (e) {
+                    // NOTE(pht)
+                    // Typically, this is the the case where I don't know how we want to handle
+                    // the error.
+                    logger.error('Unable to parse key', e, 'of strMap', strMap);
+                }
+                return memo;
+            },
+            {}
+        );
     }
 
     function _jsonToStrMap(json) {
-        return _.reduce(json, function(memo, value, key) {
-            memo[key] = JSON.stringify(value);
-            return memo;
-        }, {});
+        return _.reduce(
+            json,
+            function(memo, value, key) {
+                memo[key] = JSON.stringify(value);
+                return memo;
+            },
+            {}
+        );
     }
 
     function wrapUpdateItem(ruuid, tableName, key, newValues) {
-
         var start = techTime.start();
 
         var dynKey = dynTypes.AttributeValue.wrap(key);
@@ -92,26 +97,23 @@ module.exports = function(configuration) {
             Key: dynKey,
             AttributeUpdates: dynData,
             TableName: tableName,
-            ReturnValues: "ALL_NEW"
+            ReturnValues: 'ALL_NEW'
         };
 
         return new BPromise(function(resolve, reject) {
             dyn.updateItem(updateParams, function(err, data) {
-
-                notify("ruuid", key, "Update", techTime.end(start));
+                notify('ruuid', key, 'Update', techTime.end(start));
 
                 if (err) {
                     reject(err);
                 } else {
                     resolve();
                 }
-
             });
         });
     }
 
     function wrapPutItem(ruuid, tableName, key, item) {
-
         var start = techTime.start();
 
         var dynKey = dynTypes.AttributeValue.wrap(key);
@@ -122,22 +124,22 @@ module.exports = function(configuration) {
         var dynData = dynTypes.AttributeValue.wrap(strMap);
 
         return new BPromise(function(resolve, reject) {
-            dyn.putItem({
-                Item: _.assignIn(dynKey, dynData),
-                TableName: tableName
-            }, function(err, data) {
+            dyn.putItem(
+                {
+                    Item: _.assignIn(dynKey, dynData),
+                    TableName: tableName
+                },
+                function(err, data) {
+                    notify('ruuid', key, 'Create', techTime.end(start));
 
-                notify("ruuid", key, "Create", techTime.end(start));
-
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve();
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
                 }
-
-            });
+            );
         });
-
     }
 
     function wrapListTables() {
@@ -145,8 +147,7 @@ module.exports = function(configuration) {
             var start = techTime.start();
 
             dyn.listTables({}, function(err, data) {
-
-                notify("ruuid", {}, "Read", techTime.end(start));
+                notify('ruuid', {}, 'Read', techTime.end(start));
 
                 if (err) {
                     reject(err);
@@ -161,8 +162,7 @@ module.exports = function(configuration) {
         return new BPromise(function(resolve, reject) {
             var start = techTime.start();
             dyn.createTable(tableDef, function(err, data) {
-
-                notify("ruuid", {}, "Create", techTime.end(start));
+                notify('ruuid', {}, 'Create', techTime.end(start));
 
                 if (err) {
                     reject(err);
@@ -176,18 +176,20 @@ module.exports = function(configuration) {
     function wrapDeleteTable(ruuid, tableName) {
         return new BPromise(function(resolve, reject) {
             var start = techTime.start();
-            dyn.deleteTable({
-                TableName: tableName
-            }, function(err, data) {
+            dyn.deleteTable(
+                {
+                    TableName: tableName
+                },
+                function(err, data) {
+                    notify('ruuid', {}, 'Delete', techTime.end(start));
 
-                notify("ruuid", {}, "Delete", techTime.end(start));
-
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(data);
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(data);
+                    }
                 }
-            });
+            );
         });
     }
 
@@ -202,73 +204,61 @@ module.exports = function(configuration) {
         };
 
         return new BPromise(function(resolve, reject) {
-
-            logger.debug("getItem called with params ");
+            logger.debug('getItem called with params ');
             logger.debug(params);
 
             dyn.getItem(params, function(err, data) {
-
-                notify("ruuid", key, "Read", techTime.end(start));
+                notify('ruuid', key, 'Read', techTime.end(start));
 
                 if (err) {
                     reject(err);
                 } else {
-
                     // DynDB API returns a single "Item" object
                     var item = data.Item;
                     item = dynObjectToJson(item, key);
                     resolve(item);
                 }
-
             });
-
         });
-
     }
 
     function wrapDeleteAttribute(ruuid, tableName, key, attributeKey) {
-
         var start = techTime.start();
 
         var dynKey = dynTypes.AttributeValue.wrap(key);
 
         var attributeValueUpdate = {};
         attributeValueUpdate[attributeKey] = {
-            Action: "DELETE"
+            Action: 'DELETE'
         };
         var params = {
             Key: dynKey,
             TableName: tableName,
             AttributeUpdates: attributeValueUpdate,
-            ReturnValues: "ALL_OLD"
+            ReturnValues: 'ALL_OLD'
         };
 
         return new BPromise(function(resolve, reject) {
-
-            logger.debug("[wrapDeleteAttribute] Will update attribute with params", params);
+            logger.debug('[wrapDeleteAttribute] Will update attribute with params', params);
 
             dyn.updateItem(params, function(err, data) {
-
-                logger.debug("[wrapDeleteAttribute] return from update", data);
+                logger.debug('[wrapDeleteAttribute] return from update', data);
 
                 if (err) {
                     reject(err);
                     return;
                 }
 
-                notify("ruuid", key, "Update", techTime.end(start));
+                notify('ruuid', key, 'Update', techTime.end(start));
 
                 var item = data.Attributes;
                 item = dynObjectToJson(item, key);
                 resolve(item);
-
             });
-
         });
     }
 
     function wrapRemoveItem(ruuid, tableName, key) {
-
         var start = techTime.start();
 
         var dynKey = dynTypes.AttributeValue.wrap(key);
@@ -279,10 +269,8 @@ module.exports = function(configuration) {
         };
 
         return new BPromise(function(resolve, reject) {
-
             dyn.deleteItem(params, function(err, data) {
-
-                notify("ruuid", key, "Delete", techTime.end(start));
+                notify('ruuid', key, 'Delete', techTime.end(start));
 
                 if (err) {
                     reject(err);
@@ -307,5 +295,4 @@ module.exports = function(configuration) {
             return !!(configuration.dynDB && configuration.dynDB.local);
         }
     };
-
 };

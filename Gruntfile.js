@@ -1,5 +1,4 @@
 module.exports = function(grunt) {
-
     grunt.loadNpmTasks('grunt-release');
     grunt.loadNpmTasks('grunt-tag');
 
@@ -9,8 +8,8 @@ module.exports = function(grunt) {
                 npm: false,
                 afterReleaseTasks: ['tag'],
                 github: {
-                    repo: "AirVantage/node-tech-dyndb",
-                    accessTokenVar: "GITHUB_ACCESS_TOKEN"
+                    repo: 'AirVantage/node-tech-dyndb',
+                    accessTokenVar: 'GITHUB_ACCESS_TOKEN'
                 }
             }
         },
