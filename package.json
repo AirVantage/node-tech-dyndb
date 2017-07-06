@@ -1,39 +1,40 @@
 {
-    "name": "node-tech-dyndb",
-    "version": "2.0.2",
-    "description": "Dynamo DB wrapper",
-    "license": "MIT",
-    "main": "techDynDb.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/AirVantage/node-tech-dyndb.git"
+  "name": "node-tech-dyndb",
+  "version": "2.0.2",
+  "description": "Dynamo DB wrapper",
+  "license": "MIT",
+  "main": "techDynDb.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AirVantage/node-tech-dyndb.git"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.0.29",
+    "bluebird": "^2.9.9",
+    "dynamodb-data-types": "^2.0.0",
+    "lodash": "^4.16.0",
+    "node-tech-time": "git://github.com/AirVantage/node-tech-time.git#1.x",
+    "node-tech-logger": "git://github.com/AirVantage/node-tech-logger.git#3.x"
+  },
+  "optionalDependencies": {
+    "winston-syslog": "^1.2.5"
+  },
+  "devDependencies": {
+    "eslint": "^4.1.1",
+    "grunt": "^0.4.5",
+    "grunt-release": "^0.11.0",
+    "grunt-tag": "^0.1.0",
+    "prettier": "^1.5.2"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true
     },
-    "dependencies": {
-        "aws-sdk": "^2.0.29",
-        "bluebird": "^2.9.9",
-        "dynamodb-data-types": "^2.0.0",
-        "lodash": "^4.16.0",
-        "node-tech-time": "git://github.com/AirVantage/node-tech-time.git#1.x",
-        "node-tech-logger": "git://github.com/AirVantage/node-tech-logger.git#3.x"
-    },
-    "optionalDependencies": {
-        "winston-syslog": "^1.2.5"
-    },
-    "devDependencies": {
-        "eslint": "^4.1.1",
-        "grunt": "^0.4.5",
-        "grunt-release": "^0.11.0",
-        "grunt-tag": "^0.1.0",
-        "prettier": "^1.5.2"
-    },
-    "eslintConfig": {
-        "env": {
-            "node": true,
-            "es6": true
-        },
-        "extends": ["eslint:recommended"],
-        "rules": {
-            "linebreak-style": ["error", "unix"]
-        }
+    "extends": ["eslint:recommended"],
+    "rules": {
+      "linebreak-style": ["error", "unix"],
+      "max-params": ["warn", 3]
     }
+  }
 }
