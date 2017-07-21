@@ -20,8 +20,21 @@
     "winston-syslog": "^1.2.5"
   },
   "devDependencies": {
+    "eslint": "^4.1.1",
     "grunt": "^0.4.5",
     "grunt-release": "^0.11.0",
-    "grunt-tag": "^0.1.0"
+    "grunt-tag": "^0.1.0",
+    "prettier": "^1.5.2"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es6": true
+    },
+    "extends": ["eslint:recommended"],
+    "rules": {
+      "linebreak-style": ["error", "unix"],
+      "max-params": ["warn", 3]
+    }
   }
 }
