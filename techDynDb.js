@@ -27,7 +27,6 @@ module.exports = function(configuration) {
     dynDBOptions.secretAccessKey = configuration.dynDB.secretAccessKey;
   }
   var dyn = new AWS.DynamoDB(dynDBOptions);
-
   var emitter = new events.EventEmitter();
 
   function notify(ruuid, key, category, duration) {
@@ -113,6 +112,44 @@ module.exports = function(configuration) {
     });
   }
 
+  /**
+   * Put an item with mixed valued (String / JSON)
+   * @param  {String} ruuid
+   * @param  {String} tableName
+   * @param  {String} key
+   * @param  {Object} newValues          
+   * @param  {Array} jsonKeys       List of JSON Keys
+   * @return {BPromise}
+   */
+  function wrapUpdateMixedItem(ruuid, tableName, key, newValues, jsonKeys) {
+    var start = techTime.start();
+
+    var dynKey = dynTypes.AttributeValue.wrap(key);
+
+    // Stringify JSON type values
+    var jsonItems = _.pick(newValues, jsonKeys);
+    var jsonStringItems = _jsonToStrMap(jsonItems);
+
+    var updateParams = {
+      Key: dynKey,
+      AttributeUpdates: dynTypes.AttributeValueUpdate.put(_.assignIn(jsonStringItems, _.omit(newValues, jsonKeys))),
+      TableName: tableName,
+      ReturnValues: 'ALL_NEW'
+    };
+
+    return new BPromise(function(resolve, reject) {
+      dyn.updateItem(updateParams, function(err, data) {
+        notify('ruuid', key, 'Update', techTime.end(start));
+
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
   function wrapPutItem(ruuid, tableName, key, item) {
     var start = techTime.start();
 
@@ -122,6 +159,45 @@ module.exports = function(configuration) {
     // (otherwise, we would have to recursively specify the type of each data...)
     var strMap = _jsonToStrMap(item);
     var dynData = dynTypes.AttributeValue.wrap(strMap);
+
+    return new BPromise(function(resolve, reject) {
+      dyn.putItem(
+        {
+          Item: _.assignIn(dynKey, dynData),
+          TableName: tableName
+        },
+        function(err, data) {
+          notify('ruuid', key, 'Create', techTime.end(start));
+
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        }
+      );
+    });
+  }
+
+  /**
+   * Put an item with mixed valued (String / JSON)
+   * @param  {String} ruuid
+   * @param  {String} tableName
+   * @param  {String} key
+   * @param  {Object} item          
+   * @param  {Array} jsonKeys       List of JSON Keys
+   * @return {BPromise}
+   */
+  function wrapPutMixedItem(ruuid, tableName, key, item, jsonKeys) {
+    var start = techTime.start();
+
+    var dynKey = dynTypes.AttributeValue.wrap(key);
+
+    // Stringify JSON type values
+    var jsonItems = _.pick(item, jsonKeys);
+    var jsonStringItems = _jsonToStrMap(jsonItems);
+
+    var dynData = dynTypes.AttributeValue.wrap(_.assignIn(jsonStringItems, _.omit(item, jsonKeys)));
 
     return new BPromise(function(resolve, reject) {
       dyn.putItem(
@@ -281,16 +357,39 @@ module.exports = function(configuration) {
     });
   }
 
+  function queryTable(ruuid, params) {
+    var start = techTime.start();
+
+    return new BPromise(function(resolve, reject) {
+      dyn.query(params, function(err, data) {
+        if (err) {
+          console.error('Unable to query. Error:', JSON.stringify(err, null, 2));
+          reject(err, data);
+        } else {
+          notify('Query succeeded.', techTime.end(start));
+          var items = [];
+          data.Items.forEach(function(item) {
+            items.push(dynTypes.AttributeValue.unwrap(item));
+          });
+          resolve(items);
+        }
+      });
+    });
+  }
+
   return {
     on: emitter.on.bind(emitter),
     listTables: wrapListTables,
     getItem: wrapGetItem,
     putItem: wrapPutItem,
+    putMixedItem: wrapPutMixedItem,
     createTable: wrapCreateTable,
     deleteTable: wrapDeleteTable,
     deleteAttribute: wrapDeleteAttribute,
     updateItem: wrapUpdateItem,
+    updateMixedItem: wrapUpdateMixedItem,
     removeItem: wrapRemoveItem,
+    queryTable: queryTable,
     isLocal: function() {
       return !!(configuration.dynDB && configuration.dynDB.local);
     }
