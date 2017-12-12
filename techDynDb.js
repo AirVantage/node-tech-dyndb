@@ -200,7 +200,7 @@ module.exports = function(configuration) {
     var start = techTime.start();
 
     var dynKey = dynTypes.AttributeValue.wrap(key);
-    var dynData = dynTypes.AttributeValue.wrap(getDynData(item, jsonKeys));
+    var dynData = dynTypes.AttributeValue.wrap(item ? getDynData(item, jsonKeys) : {});
 
     return new BPromise(function(resolve, reject) {
       dyn.putItem(
