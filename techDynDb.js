@@ -112,10 +112,8 @@ module.exports = function(configuration) {
     });
   }
 
-  //
   /**
    * Returns an object compatible with dynamoDB
-   * 
    * @param  {Object} data 
    * @param  {Array} jsonKeys   JSON content keys to be wrapped as string
    * @return {Object}
@@ -141,8 +139,7 @@ module.exports = function(configuration) {
     var updateParams = {
       Key: dynTypes.AttributeValue.wrap(key),
       AttributeUpdates: dynTypes.AttributeValueUpdate.put(getDynData(newValues, jsonKeys)),
-      TableName: tableName,
-      ReturnValues: 'ALL_NEW'
+      TableName: tableName
     };
 
     return new BPromise(function(resolve, reject) {
