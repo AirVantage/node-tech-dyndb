@@ -357,11 +357,15 @@ module.exports = function(configuration) {
     });
   }
 
-  function queryTable(ruuid, params) {
+  function queryTable(ruuid, tableName, params) {
     var start = techTime.start();
 
+    var queryParams = _.extend(params, {
+      TableName: tableName
+    });
+
     return new BPromise(function(resolve, reject) {
-      dyn.query(params, function(err, data) {
+      dyn.query(queryParams, function(err, data) {
         if (err) {
           console.error('Unable to query. Error:', JSON.stringify(err, null, 2));
           reject(err, data);
